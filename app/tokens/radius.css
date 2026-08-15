@@ -1,0 +1,13 @@
+/* Softer than the original system throughout, and pills carry every control. */
+:root {
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+  --radius-card: var(--radius-lg);
+  --radius-control: var(--radius-pill);
+  --radius-tile: 16px;
+}
