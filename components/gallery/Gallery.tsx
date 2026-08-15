@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ds/Button';
+import { Button, ButtonLink } from '@/components/ds/Button';
 import { EmptyState } from '@/components/ds/EmptyState';
 import { Icon } from '@/components/ds/Icon';
 import { Input } from '@/components/ds/Input';
@@ -121,6 +121,19 @@ export function Gallery({ companies, sectors, areas }: { companies: CompanyView[
               )}
             </div>
           </>
+        ) : companies.length === 0 ? (
+          /* Nothing filtered out — there is genuinely nothing here yet. Telling a
+             first visitor to clear filters they never set is worse than useless. */
+          <EmptyState
+            icon="map-pin"
+            title="No listings yet"
+            message="The map is new. Companies appear here as they are checked, one at a time, by a person."
+            action={
+              <ButtonLink href="/add" style={{ marginTop: 'var(--space-2)' }}>
+                Add your startup
+              </ButtonLink>
+            }
+          />
         ) : (
           <EmptyState
             icon="search"
@@ -135,8 +148,8 @@ export function Gallery({ companies, sectors, areas }: { companies: CompanyView[
         )}
       </div>
 
-      {/* Floating dock */}
-      <div className="wm-dock">
+      {/* Floating dock — pointless with an empty map */}
+      <div className="wm-dock" style={{ display: companies.length ? undefined : 'none' }}>
         <button type="button" className="wm-dock__btn" onClick={() => setSheetOpen(true)} aria-expanded={sheetOpen}>
           <Icon name="sliders-horizontal" size={16} />
           Filter

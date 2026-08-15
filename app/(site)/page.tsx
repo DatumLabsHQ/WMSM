@@ -25,19 +25,24 @@ export default async function HomePage() {
       <section className="wm-hero">
         <h1>Discover West Midlands startups</h1>
         <p>
-          A gallery of {count(stats.companies)} companies across Birmingham, Solihull, Coventry, Warwickshire and the Black Country,
-          plus the roles and funding behind them. Checked by a person.
+          {stats.companies
+            ? `A gallery of ${count(stats.companies)} companies across Birmingham, Solihull, Coventry, Warwickshire and the Black Country, plus the roles and funding behind them. Checked by a person.`
+            : 'Birmingham, Solihull, Coventry, Warwickshire and the Black Country. The first listings are being checked now — every one is read by a person before it appears.'}
         </p>
       </section>
 
-      <div className="wm-page" style={{ marginBottom: 'var(--space-14)' }}>
-        <FundingTicker rounds={rounds} />
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-3)' }}>
-          <Link href="/funding" style={{ font: 'var(--type-body-sm)', color: 'var(--text-muted)' }}>
-            See all funding →
-          </Link>
+      {/* The ticker hides itself with no rounds; the link under it has to go too,
+          or an empty map shows a lone "See all funding" pointing at nothing. */}
+      {rounds.length ? (
+        <div className="wm-page" style={{ marginBottom: 'var(--space-14)' }}>
+          <FundingTicker rounds={rounds} />
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-3)' }}>
+            <Link href="/funding" style={{ font: 'var(--type-body-sm)', color: 'var(--text-muted)' }}>
+              See all funding →
+            </Link>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <Suspense fallback={null}>
         <Gallery companies={wall} sectors={sectors} areas={areas} />
