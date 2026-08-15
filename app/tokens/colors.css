@@ -1,0 +1,113 @@
+/* Datum Labs palette.
+   Source of truth: brand/datum-labs.json, transcribed from the Brand Expansion
+   book. Raw colour values are allowed to exist here and nowhere else — that is
+   what `npm run lint:brand` enforces.
+
+   Five brand colours, plus two documented exemptions the brand book does not
+   cover: a categorical scale for sector, and functional status signals. */
+:root {
+  /* --- Brand, exact --- */
+  --electric-sapphire: #4A6CF7; /* primary/01 — the action colour */
+  --platinum: #F5F7FA;          /* primary/02 — page ground */
+  --prussian: #03072D;          /* primary/03 — deepest ink */
+  --navy: #000B78;              /* secondary/04 — depth, gradient end stop */
+  --onyx: #141414;              /* secondary/05 — see $unverified in the spec */
+
+  /* --- Ink: stepped down from Prussian Blue --- */
+  --ink-900: #03072D;
+  --ink-800: #0B1140;
+  --ink-700: #1B2352;
+  --ink-600: #3B4468;
+  --ink-500: #5C6486;
+  --ink-400: #8D94AC;
+  --ink-300: #B6BBCC;
+  --ink-200: #D7DAE5;
+  --ink-100: #EAECF2;
+
+  /* --- Paper: stepped up from Platinum --- */
+  --paper-100: #FFFFFF;
+  --paper-200: #F5F7FA;
+  --paper-300: #EDEFF5;
+  --paper-400: #E1E5EE;
+
+  /* --- Electric Sapphire, stepped for interaction --- */
+  --route-700: #2942BC; /* active */
+  --route-600: #3A57DE; /* hover */
+  --route-500: #4A6CF7; /* rest — the brand value, exact */
+  --route-300: #9BAAFB;
+  --route-100: #ECEFFE;
+
+  /* --- Sector: a data palette, not a brand palette. See brand/datum-labs.json --- */
+  --sector-fintech: #2563EB;
+  --sector-health: #0F9D6E;
+  --sector-manufacturing: #E07B3C;
+  --sector-games: #7C3AED;
+  --sector-cleantech: #0E9AA7;
+  --sector-creative: #DB2777;
+
+  /* --- Status: functional signals, deliberately desaturated --- */
+  --moss-600: #17603A;
+  --moss-500: #1F7A4C;
+  --moss-100: #E7F5EE;
+  --brick-600: #7F1E15;
+  --brick-500: #A3271C;
+  --brick-100: #FBE9E7;
+  --brass-600: #8A5A08;
+  --brass-500: #A66E0B;
+  --brass-100: #FBF0DD;
+
+  /* --- Copper is not a Datum Labs colour. Mapped onto the brand blues so the
+         accent tone still resolves without introducing a sixth hue. --- */
+  --copper-700: var(--navy);
+  --copper-600: var(--route-700);
+  --copper-500: var(--route-600);
+  --copper-200: var(--route-300);
+  --copper-100: var(--route-100);
+
+  /* --- Semantic aliases --- */
+  --text-primary: var(--ink-900);
+  --text-secondary: var(--ink-500);
+  --text-muted: var(--ink-400);
+  --text-inverse: var(--paper-100);
+  --text-link: var(--route-600);
+  --text-link-hover: var(--route-700);
+  --text-accent: var(--ink-400);
+
+  --surface-page: var(--paper-200);
+  --surface-card: var(--paper-100);
+  --surface-sunken: var(--paper-300);
+  --surface-raised: var(--paper-100);
+  --surface-inverse: var(--prussian);
+  --surface-inverse-alt: var(--ink-800);
+  --surface-map: #EBEEF4;
+  --surface-water: #D3DBEC;
+
+  --border-hairline: rgba(3, 7, 45, 0.09);
+  --border-strong: rgba(3, 7, 45, 0.18);
+  --border-inverse: rgba(255, 255, 255, 0.14);
+  --border-focus: var(--route-500);
+
+  --fill-primary: var(--route-500);
+  --fill-primary-hover: var(--route-600);
+  --fill-primary-active: var(--route-700);
+  --fill-accent: var(--prussian);
+  --fill-accent-hover: var(--ink-800);
+
+  --status-success: var(--moss-500);
+  --status-success-bg: var(--moss-100);
+  --status-warning: var(--brass-600);
+  --status-warning-bg: var(--brass-100);
+  --status-danger: var(--brick-500);
+  --status-danger-bg: var(--brick-100);
+  --status-info: var(--route-600);
+  --status-info-bg: var(--route-100);
+
+  --overlay-scrim: rgba(3, 7, 45, 0.48);
+  --overlay-panel: rgba(255, 255, 255, 0.82);
+
+  /* --- Brand gradient. The book's recipe is a brandmark silhouette plus noise,
+         texture and blur; this is the flat CSS equivalent for surfaces. --- */
+  --gradient-brand: linear-gradient(135deg, var(--route-500), var(--navy));
+  --gradient-brand-deep: linear-gradient(160deg, var(--navy), var(--prussian));
+  --gradient-brand-wash: linear-gradient(135deg, var(--route-100), var(--paper-200));
+}

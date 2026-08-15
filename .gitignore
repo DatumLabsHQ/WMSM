@@ -1,0 +1,15 @@
+node_modules
+.next
+out
+*.log
+.env
+.env*.local
+*.db
+*.db-journal
+lib/prisma/generated
+.DS_Store
+next-env.d.ts
+tsconfig.tsbuildinfo
+.data/
+.open-next/
+.wrangler/

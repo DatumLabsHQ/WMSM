@@ -1,0 +1,186 @@
+{
+  "$comment": "Machine-readable Datum Labs brand spec, transcribed from 'Datum Labs - Brand Expansion' (2026). This file is the single source of truth for scripts/brand-lint.ts. Update it here, never in the linter.",
+  "brand": "Datum Labs",
+  "attributes": [
+    "Precise",
+    "Deliberate",
+    "Dependable",
+    "Rigorous"
+  ],
+  "palette": {
+    "electric-sapphire": {
+      "hex": "#4A6CF7",
+      "rgb": [
+        74,
+        108,
+        247
+      ],
+      "role": "primary/01",
+      "use": "The action colour. Links, primary fills, the brandmark."
+    },
+    "platinum": {
+      "hex": "#F5F7FA",
+      "rgb": [
+        245,
+        247,
+        250
+      ],
+      "role": "primary/02",
+      "use": "Page ground."
+    },
+    "prussian-blue": {
+      "hex": "#03072D",
+      "rgb": [
+        3,
+        7,
+        45
+      ],
+      "role": "primary/03",
+      "use": "Deepest ink. Type and inverse surfaces."
+    },
+    "navy": {
+      "hex": "#000B78",
+      "rgb": [
+        0,
+        11,
+        120
+      ],
+      "role": "secondary/04",
+      "use": "Depth under Electric Sapphire; gradient end stop."
+    },
+    "onyx": {
+      "hex": "#141414",
+      "rgb": [
+        20,
+        20,
+        20
+      ],
+      "role": "secondary/05",
+      "use": "Near-black surfaces.",
+      "$unverified": "The deck prints Onyx as #000B78 — identical to Navy — which is a copy error, since the swatch is clearly near-black. #141414 is a stand-in read from the swatch. Replace with the real value."
+    }
+  },
+  "neutrals": {
+    "$comment": "Derived from Prussian Blue and Platinum, not given in the deck. Needed for UI states the brand book does not cover.",
+    "white": "#FFFFFF"
+  },
+  "dataPalette": {
+    "$comment": "NOT brand colours. A categorical scale for encoding sector, which the brand book does not address and a directory cannot work without. Governed here so the linter can allow exactly these and nothing else.",
+    "sector-fintech": "#2563EB",
+    "sector-health": "#0F9D6E",
+    "sector-manufacturing": "#E07B3C",
+    "sector-games": "#7C3AED",
+    "sector-cleantech": "#0E9AA7",
+    "sector-creative": "#DB2777"
+  },
+  "typography": {
+    "primary": {
+      "family": "Source Serif 4",
+      "nextFontExport": "Source_Serif_4",
+      "$comment": "The deck says 'Source Serif Pro'; Google Fonts now ships it as Source Serif 4. Same typeface, current name.",
+      "roles": [
+        "headings",
+        "subheadings"
+      ],
+      "cssVar": "--font-display"
+    },
+    "secondary": {
+      "family": "Geist",
+      "nextFontExport": "Geist",
+      "roles": [
+        "subheadings",
+        "body"
+      ],
+      "cssVar": "--font-body"
+    },
+    "tertiary": {
+      "family": "Geist Mono",
+      "nextFontExport": "Geist_Mono",
+      "roles": [
+        "labels",
+        "captions",
+        "eyebrows"
+      ],
+      "cssVar": "--font-mono"
+    }
+  },
+  "gradients": {
+    "rule": "Gradients are core to the identity, but only approved ones. Build them from tokens — never from raw hex — so a palette change cannot leave a gradient behind.",
+    "approvedStops": [
+      "--route-500",
+      "--route-600",
+      "--route-700",
+      "--navy",
+      "--prussian",
+      "--sector-*"
+    ],
+    "recipe": "Brandmark silhouette, then noise (mono, #000B78 at 20%), texture, and layer blur. Noise for depth, texture for tactility, blur for a soft finish."
+  },
+  "texture": {
+    "rule": "Dashed intersecting lines over colour gradients, soft-light blend. Adds depth without competing with the palette beneath.",
+    "blendMode": "soft-light"
+  },
+  "imagery": {
+    "rule": "Custom dithering, blue duotone. No plain photography."
+  },
+  "lint": {
+    "scan": [
+      "app",
+      "components",
+      "lib"
+    ],
+    "$comment": "Token files declare the palette, so they are the source of truth rather than a violation of it.",
+    "paletteSourceFiles": [
+      "app/tokens/colors.css",
+      "app/tokens/elevation.css",
+      "app/tokens/typography.css",
+      "app/globals.css",
+      "app/tokens/brand.css"
+    ],
+    "allowedRawColours": [
+      "#FFFFFF",
+      "#FFF",
+      "#FFFFFF00",
+      "transparent",
+      "currentColor",
+      "inherit",
+      "none"
+    ],
+    "$emailComment": "lib/email/templates.ts uses literal hex on purpose: email clients do not support CSS custom properties. The literals must still be brand values, so the linter checks them like anything else."
+  },
+  "statusPalette": {
+    "$comment": "Also not brand colours. Success/warning/danger are functional signals the brand book does not cover, and a product that reviews submissions and sends email cannot work without them. Kept deliberately desaturated so they sit under the blue rather than fight it.",
+    "success": "#1F7A4C",
+    "success-bg": "#E7F5EE",
+    "warning": "#8A5A08",
+    "warning-bg": "#FBF0DD",
+    "danger": "#A3271C",
+    "danger-bg": "#FBE9E7"
+  },
+  "derived": {
+    "$comment": "Stepped from Prussian Blue and Platinum. The brand book gives five colours; a working interface needs a neutral ramp for borders, muted type and sunken surfaces. Declared here so the linter knows them, and so anything outside this ramp is still a violation.",
+    "ink-900": "#03072D",
+    "ink-800": "#0B1140",
+    "ink-700": "#1B2352",
+    "ink-600": "#3B4468",
+    "ink-500": "#5C6486",
+    "ink-400": "#8D94AC",
+    "ink-300": "#B6BBCC",
+    "ink-200": "#D7DAE5",
+    "ink-100": "#EAECF2",
+    "paper-100": "#FFFFFF",
+    "paper-200": "#F5F7FA",
+    "paper-300": "#EDEFF5",
+    "paper-400": "#E1E5EE",
+    "route-700": "#2942BC",
+    "route-600": "#3A57DE",
+    "route-500": "#4A6CF7",
+    "route-300": "#9BAAFB",
+    "route-100": "#ECEFFE",
+    "surface-map": "#EBEEF4",
+    "surface-water": "#D3DBEC",
+    "moss-600": "#17603A",
+    "brick-600": "#7F1E15",
+    "brass-500": "#A66E0B"
+  }
+}

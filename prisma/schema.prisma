@@ -1,0 +1,360 @@
+// West Midlands Startup Map — data model.
+// Companies are the spine; every feed (funding, jobs, perks, spaces, events)
+// either hangs off a company or sits regional.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/prisma/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// A fixed six-hue cluster. Colour and glyph are design-system tokens and are never reassigned.
+model Sector {
+  id        String    @id
+  slug      String    @unique
+  label     String
+  colorVar  String // e.g. var(--sector-fintech)
+  icon      String // lucide glyph name
+  blurb     String
+  sortOrder Int       @default(0)
+  companies Company[]
+}
+
+model Company {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  blurb       String
+  about       String?
+  sector      Sector    @relation(fields: [sectorId], references: [id])
+  sectorId    String
+  stage       String // Pre-seed, Seed, Series A, Series B, Bootstrapped
+  headcount   String // 1–10, 11–50, 51–200, 201+
+  headcountNum Int      @default(0)
+  locality    String // Digbeth, Leamington Spa
+  postcode    String // B9, CV32
+  authority   String // Birmingham, Coventry, Solihull, Warwickshire, Black Country
+  lat         Float
+  lng         Float
+  founded     Int
+  raisedGbp   Int       @default(0) // whole pounds; 0 = bootstrapped/undisclosed
+  website     String?
+  /// Real mark when we have one. Empty means BrandTile generates a tile instead.
+  logoUrl     String?
+  /// Set when a postcode has been resolved to a real point rather than a placeholder.
+  geocodedAt  DateTime?
+  hiring      Boolean   @default(false)
+  verified    Boolean   @default(false)
+  claimed     Boolean   @default(false)
+  status      String    @default("published") // published | pending | rejected
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  rounds      Round[]
+  jobs        Job[]
+  articles    Article[]
+  snapshots   CompanySnapshot[]
+
+  @@index([sectorId])
+  @@index([status])
+}
+
+model Round {
+  id         String   @id @default(cuid())
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId  String
+  stage      String // Seed, Series A, Grant
+  amountGbp  Int
+  announced  DateTime
+  investors  String // " · " separated, as printed
+  sourceUrl  String?
+  investorLinks RoundInvestor[]
+
+  @@index([companyId])
+  @@index([announced])
+}
+
+model Job {
+  id           String   @id @default(cuid())
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId    String
+  title        String
+  discipline   String // Engineering, Commercial, Ops, Design
+  arrangement  String // Hybrid, On-site, Remote
+  locality     String
+  salaryLabel  String // £70–85k, £300/day
+  salaryFloor  Int      @default(0) // for the salary-floor filter
+  postedAt     DateTime @default(now())
+  applyUrl     String?
+
+  @@index([companyId])
+  @@index([postedAt])
+}
+
+model Event {
+  id       String   @id @default(cuid())
+  title    String
+  venue    String
+  locality String
+  postcode String   @default("")
+  lat      Float    @default(52.4797)
+  lng      Float    @default(-1.9026)
+  startsAt DateTime
+  rsvpUrl  String?
+
+  @@index([startsAt])
+}
+
+model Perk {
+  id       String  @id @default(cuid())
+  title    String
+  partner  String
+  blurb    String
+  eligible String // who can claim it
+  sortOrder Int    @default(0)
+}
+
+model Space {
+  id       String @id @default(cuid())
+  name     String
+  locality String
+  postcode String
+  deskNote String // "12 desks", "Cohort open"
+  lat      Float
+  lng      Float
+}
+
+/// A company submitted through "Add your startup". Reviewed by a human before it goes live.
+model Submission {
+  id          String   @id @default(cuid())
+  name        String
+  website     String
+  contactName String
+  contactEmail String
+  sectorId    String
+  stage       String
+  postcode    String
+  blurb       String
+  status      String   @default("pending") // pending | approved | rejected
+  note        String? // why it was rejected, or what was changed on approval
+  reviewedAt  DateTime?
+  companyId   String? // the listing this became, once approved
+  createdAt   DateTime @default(now())
+
+  @@index([status])
+}
+
+/// Newsletter member. Double opt-in: nothing is ever sent to `pending`.
+model Subscriber {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  postcode     String?
+  source       String    @default("site") // site | jobs | funding | news
+  status       String    @default("pending") // pending | confirmed | unsubscribed | bounced
+  /// Comma-separated: weekly, funding, jobs
+  topics       String    @default("weekly,funding,jobs")
+  confirmToken String?   @unique
+  unsubToken   String    @unique
+  confirmedAt  DateTime?
+  unsubbedAt   DateTime?
+  lastSentAt   DateTime?
+  createdAt    DateTime  @default(now())
+
+  @@index([status])
+}
+
+/// Warm-intro requests routed through the map's own network.
+model IntroRequest {
+  id        String   @id @default(cuid())
+  companyId String
+  fromName  String
+  fromEmail String
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+/// "This is my company." The token proves control of the company's own domain.
+model ClaimRequest {
+  id         String    @id @default(cuid())
+  companyId  String
+  email      String
+  token      String    @unique
+  status     String    @default("pending") // pending | verified | expired | rejected
+  expiresAt  DateTime
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([companyId])
+  @@index([status])
+}
+
+/// A weekly reading of the numbers we track, so a profile can say what changed
+/// rather than only what is true today. Written by the daily cron.
+model CompanySnapshot {
+  id           String   @id @default(cuid())
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId    String
+  takenAt      DateTime @default(now())
+  headcountNum Int
+  openRoles    Int
+  raisedGbp    Int
+  verified     Boolean
+  claimed      Boolean
+
+  @@index([companyId, takenAt])
+}
+
+/// ---------------------------------------------------------------- Sourcing ---
+
+/// A company we think might belong on the map, from an importer rather than a
+/// person. Nothing here is public: a candidate becomes a listing only when
+/// someone accepts it in /admin/candidates.
+model Candidate {
+  id            String    @id @default(cuid())
+  source        String // companies-house | gtr | manual
+  /// The source's own identifier — company number, GtR organisation id — so a
+  /// re-run updates rather than duplicates.
+  sourceRef     String
+  name          String
+  website       String?
+  postcode      String
+  locality      String?
+  companyNumber String?
+  /// Comma-separated SIC codes as filed.
+  sicCodes      String    @default("")
+  /// Our guess, from the SIC codes. Null means the reviewer picks.
+  sectorId      String?
+  incorporated  DateTime?
+  /// Whatever the source gave us: SIC text, grant titles, a note from the paster.
+  note          String    @default("")
+  /// Pulled from the company's own site, so a reviewer edits a line rather than writing one.
+  blurb         String?
+  /// Null = never checked. False = the site did not respond, which is a strong signal.
+  websiteOk     Boolean?
+  enrichedAt    DateTime?
+  /// Evidence of real activity — grants found, accounts filed, site live.
+  signals       String    @default("")
+  /// 0–100. Ordering only; it never decides anything on its own.
+  score         Int       @default(0)
+  status        String    @default("new") // new | accepted | rejected | duplicate
+  reviewedAt    DateTime?
+  /// Set once accepted.
+  companyId     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([source, sourceRef])
+  @@index([status, score])
+}
+
+/// ---------------------------------------------------------------- Editorial ---
+
+/// A news post. The section exists to be indexed, so every field that search
+/// engines read is explicit rather than derived at render time.
+model Article {
+  id             String    @id @default(cuid())
+  slug           String    @unique
+  title          String
+  /// One-sentence standfirst. Used on cards, in meta description, and in the RSS feed.
+  excerpt        String
+  /// Markdown. Rendered server-side; no HTML is accepted from the editor.
+  body           String
+  kind           String    @default("story") // story | funding | roundup | guide
+  status         String    @default("draft") // draft | scheduled | published
+  publishedAt    DateTime?
+  authorName     String    @default("West Midlands Startup Map")
+  seoTitle       String?
+  seoDescription String?
+  /// Optional subject of the piece, so a company profile can list its coverage.
+  companyId      String?
+  company        Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  readMinutes    Int       @default(1)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  tags           ArticleTag[]
+
+  @@index([status, publishedAt])
+  @@index([companyId])
+}
+
+/// Topic pages. Each one is a landing page in its own right.
+model Tag {
+  id       String       @id @default(cuid())
+  slug     String       @unique
+  label    String
+  blurb    String       @default("")
+  articles ArticleTag[]
+}
+
+model ArticleTag {
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tagId     String
+
+  @@id([articleId, tagId])
+  @@index([tagId])
+}
+
+/// ---------------------------------------------------------------- Investors ---
+
+/// Normalised out of Round.investors so /investors/[slug] can be a real page.
+model Investor {
+  id      String          @id @default(cuid())
+  slug    String          @unique
+  name    String
+  kind    String          @default("Fund") // Fund | Angel network | Grant body | Corporate | University
+  blurb   String          @default("")
+  website String?
+  rounds  RoundInvestor[]
+}
+
+model RoundInvestor {
+  round      Round    @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  roundId    String
+  investor   Investor @relation(fields: [investorId], references: [id], onDelete: Cascade)
+  investorId String
+
+  @@id([roundId, investorId])
+  @@index([investorId])
+}
+
+/// -------------------------------------------------------------------- Email ---
+
+/// Durable outbox. Every message is written here before a provider is called, so
+/// nothing is lost if the provider is down, unconfigured, or rate-limiting us.
+model EmailMessage {
+  id         String    @id @default(cuid())
+  to         String
+  subject    String
+  template   String
+  /// JSON payload the template was rendered from — enough to re-render and resend.
+  payload    String
+  html       String
+  text       String
+  status     String    @default("queued") // queued | sent | failed | skipped
+  provider   String?
+  providerId String?
+  error      String?
+  attempts   Int       @default(0)
+  /// Groups a batch (one digest run) so it can be inspected or cancelled together.
+  batch      String?
+  createdAt  DateTime  @default(now())
+  sentAt     DateTime?
+
+  @@index([status, createdAt])
+  @@index([batch])
+}
+
+/// Crude but sufficient: one row per action per identifier per window.
+model RateLimit {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  count     Int      @default(0)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
