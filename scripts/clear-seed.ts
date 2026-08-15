@@ -44,7 +44,30 @@ if (slugs.length < 20) {
   process.exit(1);
 }
 
-const [companies, rounds, jobs, articles, events, perks, spaces, investors, accepted] = await Promise.all([
+/** A bad password here is the most likely failure by far, and a Prisma stack trace
+ *  buries that in forty lines. Say what happened and what to do about it. */
+async function guarded<T>(work: () => Promise<T>): Promise<T> {
+  try {
+    return await work();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (/authentication failed|28P01/i.test(message)) {
+      console.error('\nThe database rejected the password in .env.\n');
+      console.error('  This normally means .env still has an old credential.');
+      console.error('  Copy the current connection string from the Neon dashboard');
+      console.error('  (or your Vercel environment variables) into .env as:\n');
+      console.error('    DATABASE_URL="postgresql://…"\n');
+      process.exit(1);
+    }
+    if (/ENOTFOUND|ECONNREFUSED|fetch failed/i.test(message)) {
+      console.error('\nCould not reach the database. Check the host in DATABASE_URL and your connection.\n');
+      process.exit(1);
+    }
+    throw error;
+  }
+}
+
+const [companies, rounds, jobs, articles, events, perks, spaces, investors, accepted] = await guarded(() => Promise.all([
   prisma.company.count({ where: { slug: { in: slugs } } }),
   prisma.round.count({ where: { company: { slug: { in: slugs } } } }),
   prisma.job.count({ where: { company: { slug: { in: slugs } } } }),
@@ -54,7 +77,7 @@ const [companies, rounds, jobs, articles, events, perks, spaces, investors, acce
   prisma.space.count(),
   prisma.investor.count(),
   prisma.company.count({ where: { slug: { notIn: slugs } } }),
-]);
+]));
 
 console.log(`\nSeed content found (${slugs.length} known seed slugs):\n`);
 console.log(`  companies   ${companies}`);
