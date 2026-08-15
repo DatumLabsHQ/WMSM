@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit",
     "import:ch": "tsx --conditions=react-server scripts/import-companies-house.ts",
     "lint:brand": "tsx scripts/brand-lint.ts",
-    "prebuild": "tsx scripts/brand-lint.ts --ci"
+    "prebuild": "tsx scripts/brand-lint.ts --ci",
+    "db:clear-seed": "tsx --conditions=react-server scripts/clear-seed.ts"
   },
   "keywords": [],
   "author": "",
