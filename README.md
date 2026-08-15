@@ -28,6 +28,7 @@ Then open http://localhost:3000. `migrate dev` creates `dev.db` and seeds it.
 | `npm run icons` | Recompile `assets/icons/*.svg` into `lib/icons.generated.ts` |
 | `npm run import:ch -- <csv>` | Stream the Companies House bulk file into the candidate queue |
 | `npm run lint:brand` | Check the codebase against the Datum Labs brand book |
+| `npm run db:clear-seed` | Show the invented seed content; `-- --yes` deletes it |
 
 ## Surfaces
 
