@@ -11,3 +11,5 @@ lib/prisma/generated
 next-env.d.ts
 tsconfig.tsbuildinfo
 .data/
+.open-next/
+.wrangler/

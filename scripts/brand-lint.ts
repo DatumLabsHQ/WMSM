@@ -98,7 +98,10 @@ const GENERIC_FAMILIES = new Set([
   'menlo',
 ]);
 
-const HEX = /#[0-9a-fA-F]{3,8}\b/g;
+/* Lookbehind excludes HTML entities: `&#8211;` is an en dash, not a colour, and
+   the first version of this rule failed a build over one in a code comment.
+   Lengths are restricted to the four CSS forms, so #12345 no longer matches. */
+const HEX = /(?<!&)#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/g;
 const RGB = /\brgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/g;
 const FONT_FAMILY = /font-family\s*:\s*([^;}\n]+)/g;
 const FONT_SHORTHAND = /\bfont\s*:\s*([^;}\n]+)/g;

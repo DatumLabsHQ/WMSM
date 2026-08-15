@@ -8,7 +8,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 /// A fixed six-hue cluster. Colour and glyph are design-system tokens and are never reassigned.

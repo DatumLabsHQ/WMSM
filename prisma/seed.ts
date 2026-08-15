@@ -6,11 +6,11 @@
  * they are not scraped facts. Replace them before this goes anywhere public.
  */
 import { PrismaClient } from '../lib/prisma/generated/client.js';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaNeon } from '@prisma/adapter-neon';
 
-const url = process.env.DATABASE_URL ?? 'file:./prisma/dev.db';
-const adapter = new PrismaBetterSqlite3({ url });
-const prisma = new PrismaClient({ adapter });
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) throw new Error('DATABASE_URL is not set');
+const prisma = new PrismaClient({ adapter: new PrismaNeon({ connectionString }) });
 
 const slugify = (input: string) =>
   input
