@@ -1,0 +1,13 @@
+# Vercel does not read .gitignore, so anything large or local must be listed again
+# here. The Companies House bulk file alone is 2.6GB and broke the first deploy.
+.data
+.git
+.next
+node_modules
+*.db
+*.db-journal
+.env
+.env*.local
+.open-next
+.wrangler
+lib/prisma/generated
